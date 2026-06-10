@@ -797,7 +797,7 @@
     <div class="header-left">
       <div class="header-logo">🍜</div>
       <div>
-        <div class="header-title">ร้านบะหมี่ของฉัน v11</div>
+        <div class="header-title">ชายสี่บะหมี่เกี๊ยว By ซ้อเอ๋สายฝอ <span style="font-size: 0.6em; color: var(--text-muted); font-weight: normal;">v12</span></div>
         <div class="header-date" id="headerDate"></div>
       </div>
     </div>
@@ -966,6 +966,7 @@
       <div class="report-tabs">
         <button class="report-tab active" onclick="switchReportTab('daily', this)">📅 รายวัน</button>
         <button class="report-tab" onclick="switchReportTab('monthly', this)">📆 รายเดือน</button>
+        <button class="report-tab" onclick="switchReportTab('yearly', this)">📈 รายปี</button>
       </div>
 
       <!-- Daily Report -->
@@ -1031,6 +1032,33 @@
           <div class="section-title" style="margin-bottom:16px;">📊 รายรับ vs รายจ่ายรายวัน</div>
           <div class="bar-chart" id="monthlyBarChart" style="height:180px;"></div>
         </div>
+      </div>
+
+      <!-- Yearly Report -->
+      <div id="reportYearly" style="display:none;">
+        <div class="date-picker-row">
+          <label class="form-label" style="margin:0; white-space:nowrap;">เลือกปี:</label>
+          <input type="number" class="date-input" id="reportYear" value="2026" onchange="loadYearlyReport()" style="width: 120px; text-align: center;">
+        </div>
+
+        <div class="month-summary">
+          <div class="month-card total-income">
+            <div class="month-card-label">💰 รายรับรวม</div>
+            <div class="month-card-value" id="reportYearIncome">฿0</div>
+          </div>
+          <div class="month-card total-expense">
+            <div class="month-card-label">💸 รายจ่ายรวม</div>
+            <div class="month-card-value" id="reportYearExpense">฿0</div>
+          </div>
+        </div>
+
+        <div class="profit-banner">
+          <div class="profit-banner-label">📊 กำไรสุทธิประจำปี</div>
+          <div class="profit-banner-value" id="reportYearProfit">฿0</div>
+        </div>
+
+        <div class="section-title" style="margin: 24px 0 16px;">สรุปรายเดือน</div>
+        <div class="transaction-list" id="reportYearList"></div>
       </div>
 
       <div class="export-section">
@@ -1108,7 +1136,7 @@
 
     const DONUT_COLORS = ['#FF6B35', '#004E89', '#00C896'];
     const ADMIN_EMAIL = 'khemmarin2548@gmail.com';
-    const STORAGE_KEY = 'noodleShopData_v11';
+    const STORAGE_KEY = 'noodleShopData_v12';
 
     // ===== STATE =====
     let transactions = [];
@@ -1221,7 +1249,8 @@
         if (currentPage === 'expense') updateExpenseTodayList();
         if (currentPage === 'report') {
           if (document.getElementById('reportDaily').style.display !== 'none') loadDailyReport();
-          else loadMonthlyReport();
+          else if (document.getElementById('reportMonthly').style.display !== 'none') loadMonthlyReport();
+          else loadYearlyReport();
         }
       }, (error) => {
         showToast('⚠️ ข้อผิดพลาด: ' + error.message);
@@ -1236,7 +1265,8 @@
         if (currentPage === 'expense') updateExpenseTodayList();
         if (currentPage === 'report') {
           if (document.getElementById('reportDaily').style.display !== 'none') loadDailyReport();
-          else loadMonthlyReport();
+          else if (document.getElementById('reportMonthly').style.display !== 'none') loadMonthlyReport();
+          else loadYearlyReport();
         }
       });
     }
@@ -1263,6 +1293,7 @@
       const now = new Date();
       document.getElementById('reportMonth').value =
         `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      document.getElementById('reportYear').value = now.getFullYear();
     }
 
     // ===== NAVIGATION =====
@@ -1581,7 +1612,8 @@
         if (currentPage === 'expense') updateExpenseTodayList();
         if (currentPage === 'report') {
           if (document.getElementById('reportDaily').style.display !== 'none') loadDailyReport();
-          else loadMonthlyReport();
+          else if (document.getElementById('reportMonthly').style.display !== 'none') loadMonthlyReport();
+          else loadYearlyReport();
         }
       }
     }
@@ -1592,8 +1624,10 @@
       btn.classList.add('active');
       document.getElementById('reportDaily').style.display = tab === 'daily' ? 'block' : 'none';
       document.getElementById('reportMonthly').style.display = tab === 'monthly' ? 'block' : 'none';
+      document.getElementById('reportYearly').style.display = tab === 'yearly' ? 'block' : 'none';
       if (tab === 'daily') loadDailyReport();
       if (tab === 'monthly') loadMonthlyReport();
+      if (tab === 'yearly') loadYearlyReport();
     }
 
     function loadDailyReport() {
@@ -1719,7 +1753,55 @@
       }).join('');
     }
 
-    // ===== EXPORT / IMPORT =====
+    function loadYearlyReport() {
+      const year = document.getElementById('reportYear').value;
+      if (!year) return;
+      const yearTx = transactions.filter(t => t.date && t.date.startsWith(year + '-'));
+      const income = yearTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+      const expense = yearTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+
+      document.getElementById('reportYearIncome').textContent = '฿' + income.toLocaleString();
+      document.getElementById('reportYearExpense').textContent = '฿' + expense.toLocaleString();
+      document.getElementById('reportYearProfit').textContent = '฿' + (income - expense).toLocaleString();
+
+      const list = document.getElementById('reportYearList');
+      if (yearTx.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">ไม่มีรายการในปีที่เลือก</div></div>`;
+        return;
+      }
+
+      const months = {};
+      yearTx.forEach(t => {
+        const month = t.date.substring(0, 7);
+        if (!months[month]) months[month] = { income: 0, expense: 0 };
+        if (t.type === 'income') months[month].income += t.amount;
+        if (t.type === 'expense') months[month].expense += t.amount;
+      });
+
+      const monthNames = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+      const sortedMonths = Object.keys(months).sort((a, b) => b.localeCompare(a));
+      
+      list.innerHTML = sortedMonths.map(m => {
+        const mData = months[m];
+        const mIndex = parseInt(m.split('-')[1]) - 1;
+        const profit = mData.income - mData.expense;
+        const profitClass = profit >= 0 ? 'income' : 'expense';
+        const sign = profit >= 0 ? '+' : '';
+        return `
+          <div class="transaction-item" style="cursor: default;">
+            <div class="tx-icon" style="background: var(--primary-glow); color: var(--primary);">${mIndex + 1}</div>
+            <div class="tx-info">
+              <div class="tx-name">เดือน${monthNames[mIndex]}</div>
+              <div class="tx-detail">รับ ฿${mData.income.toLocaleString()} | จ่าย ฿${mData.expense.toLocaleString()}</div>
+            </div>
+            <div>
+              <div class="tx-amount ${profitClass}">${sign}฿${profit.toLocaleString()}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ===== DATA EXPORT / IMPORT =====
     function exportData() {
       const data = JSON.stringify(transactions, null, 2);
       const blob = new Blob([data], { type: 'application/json' });
