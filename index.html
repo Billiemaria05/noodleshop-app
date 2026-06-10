@@ -1109,21 +1109,27 @@
           else loadMonthlyReport();
         }
       }, (error) => {
-        console.error("Firebase read failed: " + error.code);
-        showToast('⚠️ เชื่อมต่อออนไลน์ไม่ได้ (ใช้ข้อมูลในเครื่องแทน)');
+        showToast('⚠️ ข้อผิดพลาด: ' + error.message);
         // Fallback to local storage if network fails
         try {
           const data = localStorage.getItem(STORAGE_KEY);
           transactions = data ? JSON.parse(data) : [];
         } catch { transactions = []; }
+        
+        if (currentPage === 'dashboard') updateDashboard();
+        if (currentPage === 'income') updateIncomeTodayList();
+        if (currentPage === 'expense') updateExpenseTodayList();
+        if (currentPage === 'report') {
+          if (document.getElementById('reportDaily').style.display !== 'none') loadDailyReport();
+          else loadMonthlyReport();
+        }
       });
     }
 
     function saveData() {
       // ส่งข้อมูลขึ้น Firebase
       database.ref('transactions').set(transactions).catch((error) => {
-         console.error("Firebase save failed", error);
-         showToast('⚠️ บันทึกข้อมูลออนไลน์ล้มเหลว ลองใหม่อีกครั้ง');
+         showToast('⚠️ บันทึกข้อมูลไม่ได้: ' + error.message);
       });
       // บันทึกลงเครื่องเผื่อออฟไลน์
       localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
