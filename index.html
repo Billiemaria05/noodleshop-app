@@ -429,10 +429,15 @@
       gap: 12px;
     }
     .numpad-btn {
+      -webkit-appearance: none;
+      appearance: none;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
       border: none;
       background: var(--bg-card);
       border-radius: var(--radius-sm);
-      padding: 24px;
+      padding: 0;
       font-family: 'Prompt', sans-serif;
       font-size: 2rem;
       font-weight: 700;
@@ -442,7 +447,10 @@
       border: 2px solid var(--border);
       -webkit-user-select: none;
       user-select: none;
-      min-height: 72px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .numpad-btn:hover { background: var(--bg-input); }
     .numpad-btn:active { transform: scale(0.94); background: var(--primary-glow); }
@@ -815,7 +823,7 @@
     <div class="header-left">
       <img src="icons/logo.png" class="header-logo-img" alt="Logo" onerror="this.src='https://placehold.co/45x45?text=Logo'">
       <div>
-        <div class="header-title">ชายสี่บะหมี่เกี๊ยว By ซ้อเอ๋สายฝอ <span style="font-size: 0.6em; color: var(--text-muted); font-weight: normal;">v14</span></div>
+        <div class="header-title">ชายสี่บะหมี่เกี๊ยว By ซ้อเอ๋สายฝอ <span style="font-size: 0.6em; color: var(--text-muted); font-weight: normal;">v15</span></div>
         <div class="header-date" id="headerDate"></div>
       </div>
     </div>
@@ -1154,7 +1162,7 @@
 
     const DONUT_COLORS = ['#FF6B35', '#004E89', '#00C896'];
     const ADMIN_EMAIL = 'khemmarin2548@gmail.com';
-    const STORAGE_KEY = 'noodleShopData_v14';
+    const STORAGE_KEY = 'noodleShopData_v15';
 
     // ===== STATE =====
     let transactions = [];
