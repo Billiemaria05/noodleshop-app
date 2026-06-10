@@ -779,9 +779,25 @@
       margin-top: 8px;
     }
     .login-btn:active { transform: scale(0.98); }
+
+    /* ===== SPLASH SCREEN ===== */
+    #splashScreen {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: var(--bg);
+      z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.3s;
+    }
+    .splash-logo { font-size: 4rem; animation: pulse 1.5s infinite alternate; }
+    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
   </style>
 </head>
 <body>
+  <!-- SPLASH SCREEN -->
+  <div id="splashScreen">
+    <div class="splash-logo">🍜</div>
+    <div style="margin-top: 20px; color: var(--text-muted); font-weight: 500;">กำลังโหลด...</div>
+  </div>
   <!-- LOGIN PAGE -->
   <div id="pageLogin">
     <div class="login-box">
@@ -797,7 +813,7 @@
     <div class="header-left">
       <div class="header-logo">🍜</div>
       <div>
-        <div class="header-title">ชายสี่บะหมี่เกี๊ยว By ซ้อเอ๋สายฝอ <span style="font-size: 0.6em; color: var(--text-muted); font-weight: normal;">v12</span></div>
+        <div class="header-title">ชายสี่บะหมี่เกี๊ยว By ซ้อเอ๋สายฝอ <span style="font-size: 0.6em; color: var(--text-muted); font-weight: normal;">v13</span></div>
         <div class="header-date" id="headerDate"></div>
       </div>
     </div>
@@ -1136,7 +1152,7 @@
 
     const DONUT_COLORS = ['#FF6B35', '#004E89', '#00C896'];
     const ADMIN_EMAIL = 'khemmarin2548@gmail.com';
-    const STORAGE_KEY = 'noodleShopData_v12';
+    const STORAGE_KEY = 'noodleShopData_v13';
 
     // ===== STATE =====
     let transactions = [];
@@ -1150,6 +1166,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       // Setup Auth Listener
       auth.onAuthStateChanged(user => {
+        const splash = document.getElementById('splashScreen');
+        if (splash) {
+          splash.style.opacity = '0';
+          setTimeout(() => { splash.style.display = 'none'; }, 300);
+        }
+
         if (user) {
           document.getElementById('pageLogin').classList.add('hidden');
           loadData(); // Load real data only when authenticated
