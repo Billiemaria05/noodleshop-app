@@ -1076,7 +1076,21 @@
       // ดึงข้อมูลจาก Firebase ทันทีที่มีการเปลี่ยนแปลง
       database.ref('transactions').on('value', (snapshot) => {
         const data = snapshot.val();
-        transactions = data ? data : []; // รับอาเรย์
+        
+        if (!data) {
+          // ถ้าบน Firebase ยังไม่มีข้อมูล (เพิ่งเริ่มใช้) ให้เอาข้อมูลในเครื่องไปใส่แทน
+          try {
+            const localData = localStorage.getItem(STORAGE_KEY);
+            if (localData && localData !== '[]') {
+              transactions = JSON.parse(localData);
+              saveData(); // ดันขึ้นคลาวด์
+              return;
+            }
+          } catch {}
+          transactions = [];
+        } else {
+          transactions = data;
+        }
         
         // บันทึกลงเครื่องสำรองไว้ตอนออฟไลน์
         localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
