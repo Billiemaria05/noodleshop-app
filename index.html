@@ -823,7 +823,7 @@
     <div class="header-left">
       <img src="icons/logo.png" class="header-logo-img" alt="Logo" onerror="this.src='https://placehold.co/45x45?text=Logo'">
       <div>
-        <div class="header-title">ชายสี่บะหมี่เกี๊ยว By ซ้อเอ๋สายฝอ <span style="font-size: 0.6em; color: var(--text-muted); font-weight: normal;">v15</span></div>
+        <div class="header-title">ชายสี่บะหมี่เกี๊ยว By ซ้อเอ๋สายฝอ <span style="font-size: 0.6em; color: var(--text-muted); font-weight: normal;">v16</span></div>
         <div class="header-date" id="headerDate"></div>
       </div>
     </div>
@@ -1064,7 +1064,8 @@
       <div id="reportYearly" style="display:none;">
         <div class="date-picker-row">
           <label class="form-label" style="margin:0; white-space:nowrap;">เลือกปี:</label>
-          <input type="number" class="date-input" id="reportYear" value="2026" onchange="loadYearlyReport()" style="width: 120px; text-align: center;">
+          <select class="date-input" id="reportYear" onchange="loadYearlyReport()" style="width: 120px; text-align: center; background: white;">
+          </select>
         </div>
 
         <div class="month-summary">
@@ -1162,7 +1163,7 @@
 
     const DONUT_COLORS = ['#FF6B35', '#004E89', '#00C896'];
     const ADMIN_EMAIL = 'khemmarin2548@gmail.com';
-    const STORAGE_KEY = 'noodleShopData_v15';
+    const STORAGE_KEY = 'noodleShopData_v16';
 
     // ===== STATE =====
     let transactions = [];
@@ -1323,9 +1324,19 @@
       document.getElementById('expenseDate').value = today;
       document.getElementById('reportDate').value = today;
       const now = new Date();
+      const currentY = now.getFullYear();
       document.getElementById('reportMonth').value =
-        `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      document.getElementById('reportYear').value = now.getFullYear();
+        `${currentY}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      
+      const yearSelect = document.getElementById('reportYear');
+      yearSelect.innerHTML = '';
+      for (let y = currentY + 3; y >= 2023; y--) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        yearSelect.appendChild(opt);
+      }
+      yearSelect.value = currentY;
     }
 
     // ===== NAVIGATION =====
