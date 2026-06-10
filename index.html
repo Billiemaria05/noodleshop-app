@@ -283,10 +283,10 @@
       border-radius: var(--radius-sm);
       border: 1px solid var(--border);
       transition: all 0.2s;
-      cursor: pointer;
     }
-    .transaction-item:hover { background: var(--bg-card-hover); transform: translateX(4px); }
-    .transaction-item:active { transform: scale(0.99); }
+    .transaction-item.can-delete { cursor: pointer; }
+    .transaction-item.can-delete:hover { background: var(--bg-card-hover); transform: translateX(4px); }
+    .transaction-item.can-delete:active { transform: scale(0.99); }
     .tx-icon {
       width: 54px; height: 54px;
       border-radius: 14px;
@@ -797,7 +797,7 @@
     <div class="header-left">
       <div class="header-logo">🍜</div>
       <div>
-        <div class="header-title">ร้านบะหมี่ของฉัน v10</div>
+        <div class="header-title">ร้านบะหมี่ของฉัน v11</div>
         <div class="header-date" id="headerDate"></div>
       </div>
     </div>
@@ -1107,7 +1107,8 @@
     ];
 
     const DONUT_COLORS = ['#FF6B35', '#004E89', '#00C896'];
-    const STORAGE_KEY = 'noodleShopData_v10';
+    const ADMIN_EMAIL = 'khemmarin2548@gmail.com';
+    const STORAGE_KEY = 'noodleShopData_v11';
 
     // ===== STATE =====
     let transactions = [];
@@ -1434,7 +1435,7 @@
         const time = new Date(tx.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
         const sign = tx.type === 'income' ? '+' : '-';
         return `
-          <div class="transaction-item" onclick="openDeleteModal('${tx.id}')">
+          <div class="transaction-item ${auth.currentUser && auth.currentUser.email === ADMIN_EMAIL ? 'can-delete' : ''}" onclick="openDeleteModal('${tx.id}')">
             <div class="tx-icon ${tx.type}">${tx.emoji}</div>
             <div class="tx-info">
               <div class="tx-name">${tx.category}</div>
@@ -1496,7 +1497,7 @@
       list.innerHTML = sorted.map(tx => {
         const time = new Date(tx.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
         return `
-          <div class="transaction-item" onclick="openDeleteModal('${tx.id}')">
+          <div class="transaction-item ${auth.currentUser && auth.currentUser.email === ADMIN_EMAIL ? 'can-delete' : ''}" onclick="openDeleteModal('${tx.id}')">
             <div class="tx-icon income">${tx.emoji}</div>
             <div class="tx-info">
               <div class="tx-name">${tx.category}</div>
@@ -1525,7 +1526,7 @@
       list.innerHTML = sorted.map(tx => {
         const time = new Date(tx.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
         return `
-          <div class="transaction-item" onclick="openDeleteModal('${tx.id}')">
+          <div class="transaction-item ${auth.currentUser && auth.currentUser.email === ADMIN_EMAIL ? 'can-delete' : ''}" onclick="openDeleteModal('${tx.id}')">
             <div class="tx-icon expense">${tx.emoji}</div>
             <div class="tx-info">
               <div class="tx-name">${tx.category}</div>
@@ -1541,6 +1542,10 @@
 
     // ===== DELETE =====
     function openDeleteModal(id) {
+      if (!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) {
+        showToast('⚠️ เฉพาะเจ้าของร้านเท่านั้นที่สามารถลบข้อมูลได้');
+        return;
+      }
       deleteTargetId = String(id);
       const tx = transactions.find(t => String(t.id) === deleteTargetId);
       if (tx) {
@@ -1611,7 +1616,7 @@
         const time = new Date(tx.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
         const sign = tx.type === 'income' ? '+' : '-';
         return `
-          <div class="transaction-item" onclick="openDeleteModal('${tx.id}')">
+          <div class="transaction-item ${auth.currentUser && auth.currentUser.email === ADMIN_EMAIL ? 'can-delete' : ''}" onclick="openDeleteModal('${tx.id}')">
             <div class="tx-icon ${tx.type}">${tx.emoji}</div>
             <div class="tx-info">
               <div class="tx-name">${tx.category}</div>
