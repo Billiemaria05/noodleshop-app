@@ -732,10 +732,66 @@
       .main { padding-left: 32px; padding-right: 32px; }
       .form-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
     }
+
+    /* ===== LOGIN PAGE ===== */
+    #pageLogin {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg);
+      z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    #pageLogin.hidden { display: none; }
+    .login-box {
+      background: var(--bg-card);
+      padding: 40px 24px;
+      border-radius: 28px;
+      width: 100%; max-width: 420px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+    .login-logo { font-size: 3.5rem; margin-bottom: 16px; }
+    .login-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; }
+    .login-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      font-size: 1.1rem;
+      font-family: 'Prompt', sans-serif;
+      color: var(--text);
+      margin-bottom: 16px;
+      outline: none;
+    }
+    .login-input:focus { border-color: var(--primary); }
+    .login-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-primary);
+      margin-top: 8px;
+    }
+    .login-btn:active { transform: scale(0.98); }
   </style>
 </head>
 <body>
-
+  <!-- LOGIN PAGE -->
+  <div id="pageLogin">
+    <div class="login-box">
+      <div class="login-logo">🍜 🔒</div>
+      <div class="login-title">ระบบบัญชีร้านบะหมี่</div>
+      <input type="email" id="loginEmail" class="login-input" placeholder="อีเมล (Email)">
+      <input type="password" id="loginPassword" class="login-input" placeholder="รหัสผ่าน (Password)">
+      <button class="login-btn ripple" onclick="handleLogin()">เข้าสู่ระบบ</button>
+    </div>
+  </div>
   <!-- HEADER -->
   <header class="header">
     <div class="header-left">
@@ -982,6 +1038,7 @@
         <button class="btn-export" onclick="document.getElementById('importFile').click()">📥 กู้คืนข้อมูล</button>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
       </div>
+      <button class="btn-export" style="width:100%; margin-top:14px; border-color:var(--danger); color:var(--danger);" onclick="handleLogout()">🚪 ออกจากระบบ</button>
     </div>
   </main>
 
@@ -1018,6 +1075,7 @@
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script>
     // ===== FIREBASE INIT =====
@@ -1032,6 +1090,7 @@
       measurementId: "G-KH5F5B63RB"
     };
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const database = firebase.database();
 
     // ===== CATEGORIES =====
@@ -1060,7 +1119,19 @@
 
     // ===== INIT =====
     document.addEventListener('DOMContentLoaded', () => {
-      loadData();
+      // Setup Auth Listener
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          document.getElementById('pageLogin').classList.add('hidden');
+          loadData(); // Load real data only when authenticated
+        } else {
+          document.getElementById('pageLogin').classList.remove('hidden');
+          transactions = []; // Clear local data on logout
+          updateDashboard();
+          if (database && database.ref) database.ref('transactions').off();
+        }
+      });
+
       setTodayDates();
       renderIncomeCategories();
       renderExpenseCategories();
@@ -1069,6 +1140,27 @@
       updateDashboard();
       updateHeaderDate();
     });
+
+    // ===== AUTH ACTIONS =====
+    function handleLogin() {
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPassword').value;
+      if (!email || !pass) return showToast('⚠️ กรุณากรอกอีเมลและรหัสผ่าน');
+      auth.signInWithEmailAndPassword(email, pass).then(() => {
+        showToast('✅ เข้าสู่ระบบสำเร็จ');
+      }).catch(err => {
+        showToast('⚠️ รหัสผ่านไม่ถูกต้อง: ' + err.message);
+      });
+    }
+
+    function handleLogout() {
+      auth.signOut().then(() => {
+        showToast('🚪 ออกจากระบบแล้ว');
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        navigateTo('dashboard');
+      });
+    }
 
     // ===== STORAGE (FIREBASE REALTIME) =====
     let isInitialLoad = true;
