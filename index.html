@@ -1181,7 +1181,9 @@
           } catch {}
           transactions = [];
         } else {
-          transactions = data;
+          // Firebase might return an object instead of array if data is sparse (items deleted).
+          // We force it to be a clean array and filter out nulls.
+          transactions = (Array.isArray(data) ? data : Object.values(data)).filter(Boolean);
         }
         
         // บันทึกลงเครื่องสำรองไว้ตอนออฟไลน์
