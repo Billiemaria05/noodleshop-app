@@ -1016,7 +1016,24 @@
     </div>
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script>
+    // ===== FIREBASE INIT =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyDqIVa6ZSBopFYL5hDKt4LJRbRJPRSja2A",
+      authDomain: "noodleshopsaifor101.firebaseapp.com",
+      databaseURL: "https://noodleshopsaifor101-default-rtdb.firebaseio.com",
+      projectId: "noodleshopsaifor101",
+      storageBucket: "noodleshopsaifor101.firebasestorage.app",
+      messagingSenderId: "167920622903",
+      appId: "1:167920622903:web:e27b37600235422fa30eb2",
+      measurementId: "G-KH5F5B63RB"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     // ===== CATEGORIES =====
     const INCOME_CATEGORIES = [
       { name: 'เงินสด', emoji: '💵' },
@@ -1053,15 +1070,48 @@
       updateHeaderDate();
     });
 
-    // ===== STORAGE =====
+    // ===== STORAGE (FIREBASE REALTIME) =====
+    let isInitialLoad = true;
     function loadData() {
-      try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        transactions = data ? JSON.parse(data) : [];
-      } catch { transactions = []; }
+      // ดึงข้อมูลจาก Firebase ทันทีที่มีการเปลี่ยนแปลง
+      database.ref('transactions').on('value', (snapshot) => {
+        const data = snapshot.val();
+        transactions = data ? data : []; // รับอาเรย์
+        
+        // บันทึกลงเครื่องสำรองไว้ตอนออฟไลน์
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+
+        // อัปเดตหน้าจอทุกครั้งที่มีข้อมูลใหม่เข้ามา
+        if (!isInitialLoad) {
+          showToast('🔄 ข้อมูลถูกอัปเดตแล้ว');
+        }
+        isInitialLoad = false;
+
+        if (currentPage === 'dashboard') updateDashboard();
+        if (currentPage === 'income') updateIncomeTodayList();
+        if (currentPage === 'expense') updateExpenseTodayList();
+        if (currentPage === 'report') {
+          if (document.getElementById('reportDaily').style.display !== 'none') loadDailyReport();
+          else loadMonthlyReport();
+        }
+      }, (error) => {
+        console.error("Firebase read failed: " + error.code);
+        showToast('⚠️ เชื่อมต่อออนไลน์ไม่ได้ (ใช้ข้อมูลในเครื่องแทน)');
+        // Fallback to local storage if network fails
+        try {
+          const data = localStorage.getItem(STORAGE_KEY);
+          transactions = data ? JSON.parse(data) : [];
+        } catch { transactions = []; }
+      });
     }
 
     function saveData() {
+      // ส่งข้อมูลขึ้น Firebase
+      database.ref('transactions').set(transactions).catch((error) => {
+         console.error("Firebase save failed", error);
+         showToast('⚠️ บันทึกข้อมูลออนไลน์ล้มเหลว ลองใหม่อีกครั้ง');
+      });
+      // บันทึกลงเครื่องเผื่อออฟไลน์
       localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
     }
 
