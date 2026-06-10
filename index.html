@@ -1170,15 +1170,17 @@
         const data = snapshot.val();
         
         if (!data) {
-          // ถ้าบน Firebase ยังไม่มีข้อมูล (เพิ่งเริ่มใช้) ให้เอาข้อมูลในเครื่องไปใส่แทน
-          try {
-            const localData = localStorage.getItem(STORAGE_KEY);
-            if (localData && localData !== '[]') {
-              transactions = JSON.parse(localData);
-              saveData(); // ดันขึ้นคลาวด์
-              return;
-            }
-          } catch {}
+          // ถ้าเป็นตอนเปิดแอปครั้งแรกและบนคลาวด์ไม่มีข้อมูล ให้เอาข้อมูลในเครื่องไปใส่แทน
+          if (isInitialLoad) {
+            try {
+              const localData = localStorage.getItem(STORAGE_KEY);
+              if (localData && localData !== '[]') {
+                transactions = JSON.parse(localData);
+                saveData(); // ดันขึ้นคลาวด์
+                return;
+              }
+            } catch {}
+          }
           transactions = [];
         } else {
           // Firebase might return an object instead of array if data is sparse (items deleted).
@@ -1239,12 +1241,13 @@
     }
 
     function saveData() {
+      // บันทึกลงเครื่องก่อนเสมอ เพื่อป้องกันบั๊กข้อมูลย้อนกลับ
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+      
       // ส่งข้อมูลขึ้น Firebase
       database.ref('transactions').set(transactions).catch((error) => {
          showToast('⚠️ บันทึกข้อมูลไม่ได้: ' + error.message);
       });
-      // บันทึกลงเครื่องเผื่อออฟไลน์
-      localStorage.setItem(CACHE_NAME, JSON.stringify(transactions));
     }
 
     function getToday() {
