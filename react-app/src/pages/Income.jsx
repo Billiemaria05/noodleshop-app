@@ -5,10 +5,9 @@ import { getToday, generateId } from '../utils/helpers';
 import Numpad from '../components/Numpad';
 
 const INCOME_CATEGORIES = [
-  { name: 'ขายบะหมี่หน้าร้าน', emoji: '🍜' },
-  { name: 'Lineman / Grab', emoji: '🛵' },
-  { name: 'รับเหมางานนอก', emoji: '🎪' },
-  { name: 'ขายน้ำ/เครื่องดื่ม', emoji: '🥤' }
+  { name: 'เงินสด', emoji: '💵' },
+  { name: 'เงินโอน', emoji: '📱' },
+  { name: 'สวัสดิการรัฐ', emoji: '🏛️' },
 ];
 
 const Income = () => {

@@ -5,10 +5,9 @@ import { getToday, generateId } from '../utils/helpers';
 import Numpad from '../components/Numpad';
 
 const EXPENSE_CATEGORIES = [
-  { name: 'ซื้อวัตถุดิบ (เส้น, หมู, ผัก)', emoji: '🥩' },
-  { name: 'ค่าจ้างลูกน้อง', emoji: '👥' },
-  { name: 'ค่าเช่าที่ / ค่าน้ำไฟ', emoji: '🏪' },
-  { name: 'จิปาถะ (ถุง, เครื่องปรุง)', emoji: '🛍️' }
+  { name: 'ค่าแรงลูกจ้าง', emoji: '👷' },
+  { name: 'วัตถุดิบ', emoji: '🥩' },
+  { name: 'ค่าเช่า', emoji: '🏠' },
 ];
 
 const Expense = () => {
