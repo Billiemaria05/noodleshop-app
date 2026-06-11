@@ -31,7 +31,7 @@ const Header = () => {
       <div className="header-left">
         <img src="icons/logo.png" className="header-logo-img" alt="Logo" onError={(e) => e.target.src='https://placehold.co/45x45?text=Logo'} />
         <div>
-          <div className="header-title">ชายสี่บะหมี่เกี๊ยว By ซ้อเอ๋สายฝอ <span style={{ fontSize: '0.6em', color: 'var(--text-muted)', fontWeight: 'normal' }}>v17</span></div>
+          <div className="header-title">ชายสี่บะหมี่เกี๊ยว By ซ้อเอ๋สายฝอ <span style={{ fontSize: '0.6em', color: 'var(--text-muted)', fontWeight: 'normal' }}>v21</span></div>
           <div className="header-date">{timeStr}</div>
         </div>
       </div>
