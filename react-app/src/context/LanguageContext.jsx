@@ -198,6 +198,20 @@ const translations = {
     dayNames: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
   }
 };
+// Category name translations (data stored in Thai, display in selected language)
+const categoryMap = {
+  // Income categories
+  'เงินสด': 'Cash',
+  'เงินโอน': 'Transfer',
+  'สวัสดิการรัฐ': 'Government Welfare',
+  // Expense categories
+  'ค่าแรงลูกจ้าง': 'Labor Cost',
+  'วัตถุดิบ': 'Raw Materials',
+  'ค่าเช่า': 'Rent',
+  // Legacy/backup categories
+  'ยอดรวมรายรับประจำเดือน': 'Monthly Income Total',
+  'ยอดรวมรายจ่ายประจำเดือน': 'Monthly Expense Total',
+};
 
 export const LanguageProvider = ({ children }) => {
   const [lang, setLang] = useState(() => {
@@ -212,12 +226,17 @@ export const LanguageProvider = ({ children }) => {
     return translations[lang]?.[key] || translations['th']?.[key] || key;
   };
 
+  const translateCat = (thaiName) => {
+    if (lang === 'th') return thaiName;
+    return categoryMap[thaiName] || thaiName;
+  };
+
   const toggleLang = () => {
     setLang(prev => prev === 'th' ? 'en' : 'th');
   };
 
   return (
-    <LanguageContext.Provider value={{ lang, t, toggleLang }}>
+    <LanguageContext.Provider value={{ lang, t, toggleLang, translateCat }}>
       {children}
     </LanguageContext.Provider>
   );

@@ -11,7 +11,7 @@ const INCOME_DONUT_COLORS = ['#00C896', '#00A8E8', '#FFB563', '#9B59B6', '#E74C3
 const Report = () => {
   const { transactions, deleteTransaction, importTransactions } = useTransactions();
   const { logout } = useAuth();
-  const { t } = useLanguage();
+  const { t, translateCat } = useLanguage();
   const [tab, setTab] = useState('daily');
   const [deleteTarget, setDeleteTarget] = useState(null);
   const importRef = useRef(null);
@@ -80,7 +80,7 @@ const Report = () => {
       legendItems.push(
         <div key={c.name} className="legend-item">
           <div className="legend-dot" style={{ background: color }}></div>
-          <div className="legend-label">{c.name}</div>
+          <div className="legend-label">{translateCat(c.name)}</div>
           <div className="legend-value">{pct.toFixed(0)}%</div>
         </div>
       );

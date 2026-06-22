@@ -1,9 +1,11 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { formatCurrency, formatTime, ADMIN_EMAIL } from '../utils/helpers';
 
 const TransactionItem = ({ tx, onDeleteClick }) => {
   const { currentUser } = useAuth();
+  const { translateCat } = useLanguage();
   const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
   
   const isIncome = tx.type === 'income';
@@ -21,7 +23,7 @@ const TransactionItem = ({ tx, onDeleteClick }) => {
     <div className={itemClass} onClick={handleClick}>
       <div className={iconClass}>{tx.emoji}</div>
       <div className="tx-info">
-        <div className="tx-name">{tx.category}</div>
+        <div className="tx-name">{translateCat(tx.category)}</div>
         {tx.note && <div className="tx-detail">{tx.note}</div>}
       </div>
       <div>
