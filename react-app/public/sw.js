@@ -1,4 +1,4 @@
-const CACHE_NAME = 'noodle-shop-v21';
+const CACHE_NAME = 'noodle-shop-v22';
 const ASSETS = [
   './',
   './index.html',
