@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { useTransactions } from '../context/TransactionContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { getToday, formatCurrency } from '../utils/helpers';
 import SummaryCard from '../components/SummaryCard';
 import TransactionItem from '../components/TransactionItem';
@@ -10,6 +11,7 @@ import Modal from '../components/Modal';
 
 const Dashboard = () => {
   const { transactions, deleteTransaction } = useTransactions();
+  const { currentUser } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const today = getToday();
@@ -32,6 +34,14 @@ const Dashboard = () => {
     }
   };
 
+  const handleNavigate = (path) => {
+    if (currentUser?.isGuest) {
+      alert("เฉพาะผู้ได้รับอนุญาติ");
+      return;
+    }
+    navigate(path);
+  };
+
   return (
     <div className="page active">
       <div className="summary-grid">
@@ -41,10 +51,10 @@ const Dashboard = () => {
       </div>
 
       <div className="quick-actions">
-        <button className="btn-quick income-btn ripple" onClick={() => navigate('/income')}>
+        <button className="btn-quick income-btn ripple" onClick={() => handleNavigate('/income')}>
           <ArrowDownCircle size={24} /> {t('addIncome')}
         </button>
-        <button className="btn-quick expense-btn ripple" onClick={() => navigate('/expense')}>
+        <button className="btn-quick expense-btn ripple" onClick={() => handleNavigate('/expense')}>
           <ArrowUpCircle size={24} /> {t('addExpense')}
         </button>
       </div>

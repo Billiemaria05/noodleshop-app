@@ -10,7 +10,7 @@ const INCOME_DONUT_COLORS = ['#00C896', '#00A8E8', '#FFB563', '#9B59B6', '#E74C3
 
 const Report = () => {
   const { transactions, deleteTransaction, importTransactions } = useTransactions();
-  const { logout } = useAuth();
+  const { logout, currentUser } = useAuth();
   const { t, translateCat } = useLanguage();
   const [tab, setTab] = useState('daily');
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -32,6 +32,10 @@ const Report = () => {
 
   // === BACKUP / RESTORE ===
   const handleExport = () => {
+    if (currentUser?.isGuest) {
+      alert("เฉพาะผู้ได้รับอนุญาติ");
+      return;
+    }
     const blob = new Blob([JSON.stringify(transactions, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -372,7 +376,13 @@ const Report = () => {
       {/* Backup / Restore / Logout */}
       <div className="export-section" style={{ marginTop: '28px' }}>
         <button className="btn-export" onClick={handleExport}>{t('backupData')}</button>
-        <button className="btn-export" onClick={() => importRef.current?.click()}>{t('restoreData')}</button>
+        <button className="btn-export" onClick={() => {
+          if (currentUser?.isGuest) {
+            alert("เฉพาะผู้ได้รับอนุญาติ");
+            return;
+          }
+          importRef.current?.click();
+        }}>{t('restoreData')}</button>
         <input type="file" ref={importRef} accept=".json" style={{ display: 'none' }} onChange={handleImport} />
       </div>
       <button className="btn-export" onClick={handleLogout} style={{ width: '100%', marginTop: '14px', borderColor: 'var(--danger)', color: 'var(--danger)' }}>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, loginAsGuest } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -44,6 +44,16 @@ const Login = () => {
           />
           <button type="submit" className="login-btn ripple">เข้าสู่ระบบ</button>
         </form>
+        <div style={{ marginTop: '16px', textAlign: 'center' }}>
+          <button 
+            type="button" 
+            className="login-btn ripple" 
+            style={{ backgroundColor: 'var(--text-secondary)', border: 'none' }}
+            onClick={loginAsGuest}
+          >
+            เข้าชมในฐานะผู้เยี่ยมชม (Guest)
+          </button>
+        </div>
       </div>
     </div>
   );

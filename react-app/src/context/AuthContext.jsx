@@ -23,13 +23,22 @@ export const AuthProvider = ({ children }) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
+  const loginAsGuest = () => {
+    setCurrentUser({ email: 'guest@noodle.shop', isGuest: true });
+  };
+
   const logout = () => {
+    if (currentUser?.isGuest) {
+      setCurrentUser(null);
+      return Promise.resolve();
+    }
     return signOut(auth);
   };
 
   const value = {
     currentUser,
     login,
+    loginAsGuest,
     logout
   };
 

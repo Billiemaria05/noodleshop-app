@@ -74,6 +74,10 @@ export const TransactionProvider = ({ children }) => {
   }, [currentUser, isInitialLoad]);
 
   const addTransaction = async (transaction) => {
+    if (currentUser?.isGuest) {
+      alert("เฉพาะผู้ได้รับอนุญาติ");
+      return;
+    }
     const newTxList = [...transactions, transaction];
     // Optimistic UI update
     setTransactions(newTxList);
@@ -86,6 +90,10 @@ export const TransactionProvider = ({ children }) => {
   };
 
   const deleteTransaction = async (id) => {
+    if (currentUser?.isGuest) {
+      alert("เฉพาะผู้ได้รับอนุญาติ");
+      return;
+    }
     const newTxList = transactions.filter(t => String(t.id) !== String(id));
     setTransactions(newTxList);
     try {
@@ -96,6 +104,10 @@ export const TransactionProvider = ({ children }) => {
   };
 
   const importTransactions = async (importedData) => {
+    if (currentUser?.isGuest) {
+      alert("เฉพาะผู้ได้รับอนุญาติ");
+      return;
+    }
     await set(ref(database, 'transactions'), importedData);
   };
 

@@ -34,7 +34,7 @@ const Header = () => {
       <div className="header-left">
         <img src="icons/logo.png" className="header-logo-img" alt="Logo" onError={(e) => e.target.src='https://placehold.co/45x45?text=Logo'} />
         <div>
-          <div className="header-title">{t('shopName')} <span style={{ fontSize: '0.6em', color: 'var(--text-muted)', fontWeight: 'normal' }}>v22</span></div>
+          <div className="header-title">{t('shopName')} <span style={{ fontSize: '0.6em', color: 'var(--text-muted)', fontWeight: 'normal' }}>v23</span></div>
           <div className="header-date">{timeStr}</div>
         </div>
       </div>
