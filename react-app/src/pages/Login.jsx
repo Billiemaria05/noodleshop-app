@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UtensilsCrossed, LogIn, UserCheck, AlertCircle } from 'lucide-react';
+import { LogIn, UserCheck, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -27,11 +27,16 @@ const Login = () => {
   return (
     <div id="pageLogin">
       <div className="login-box">
-        <div className="login-seal-logo">
-          <UtensilsCrossed size={42} strokeWidth={2.4} />
-        </div>
+        <img
+          src="icons/logo.png"
+          className="login-logo-img"
+          alt="ซ้อเอ๋สายฝอ"
+          onError={(e) => {
+            e.target.src = 'https://placehold.co/110x110?text=Logo';
+          }}
+        />
         <div className="login-title">{t('loginTitle')}</div>
-        <div style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 600, marginBottom: '20px' }}>
+        <div style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', fontWeight: 600, marginBottom: '22px' }}>
           {t('loginSubtitle')}
         </div>
 

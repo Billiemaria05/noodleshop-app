@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, Globe, UtensilsCrossed } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { formatTime } from '../utils/helpers';
@@ -32,9 +32,14 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-left">
-        <div className="header-logo-seal">
-          <UtensilsCrossed size={28} />
-        </div>
+        <img
+          src="icons/logo.png"
+          className="header-logo-img"
+          alt="ซ้อเอ๋สายฝอ"
+          onError={(e) => {
+            e.target.src = 'https://placehold.co/52x52?text=Logo';
+          }}
+        />
         <div>
           <div className="header-title">
             <span>{t('shopName')}</span>
