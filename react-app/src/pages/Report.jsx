@@ -1,12 +1,11 @@
 import React, { useState, useRef } from 'react';
+import { Download, Upload, LogOut, BarChart3, PieChart, Calendar } from 'lucide-react';
 import { useTransactions } from '../context/TransactionContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { getToday, formatCurrency, DONUT_COLORS } from '../utils/helpers';
+import { getToday, formatCurrency, DONUT_COLORS, INCOME_DONUT_COLORS } from '../utils/helpers';
 import TransactionItem from '../components/TransactionItem';
 import Modal from '../components/Modal';
-
-const INCOME_DONUT_COLORS = ['#00C896', '#00A8E8', '#FFB563', '#9B59B6', '#E74C3C'];
 
 const Report = () => {
   const { transactions, deleteTransaction, importTransactions } = useTransactions();
@@ -33,7 +32,7 @@ const Report = () => {
   // === BACKUP / RESTORE ===
   const handleExport = () => {
     if (currentUser?.isGuest) {
-      alert("เฉพาะผู้ได้รับอนุญาติ");
+      alert(t('unauthorizedMsg') || 'เฉพาะผู้ได้รับอนุญาต');
       return;
     }
     const blob = new Blob([JSON.stringify(transactions, null, 2)], { type: 'application/json' });
@@ -53,12 +52,12 @@ const Report = () => {
       const data = JSON.parse(text);
       if (Array.isArray(data)) {
         await importTransactions(data);
-        alert('✅ กู้คืนข้อมูลสำเร็จ!');
+        alert(t('saved'));
       } else {
-        alert('⚠️ ไฟล์ไม่ถูกต้อง');
+        alert('ไฟล์ข้อมูลไม่ถูกต้อง');
       }
     } catch {
-      alert('⚠️ ไม่สามารถอ่านไฟล์ได้');
+      alert('ไม่สามารถอ่านไฟล์ข้อมูลได้');
     }
     e.target.value = '';
   };
@@ -126,7 +125,7 @@ const Report = () => {
         </div>
 
         <div className="transaction-list">
-          {txs.length === 0 && <div style={{textAlign: 'center', color: 'var(--text-muted)', padding: '24px'}}>{t('noDataInPeriod')}</div>}
+          {txs.length === 0 && <div style={{textAlign: 'center', color: 'var(--text-muted)', padding: '28px'}}>{t('noDataInPeriod')}</div>}
           {txs.slice().reverse().map(tx => (
             <TransactionItem key={tx.id} tx={tx} onDeleteClick={handleDeleteClick} />
           ))}
@@ -188,13 +187,16 @@ const Report = () => {
         </div>
 
         <div className="card chart-container">
-          <div className="section-title" style={{ marginBottom: '16px' }}>{t('dailyChart')}</div>
+          <div className="section-title" style={{ marginBottom: '16px' }}>
+            <BarChart3 size={24} strokeWidth={2.4} />
+            <span>{t('dailyChart')}</span>
+          </div>
           <div className="bar-chart" style={{ overflowX: 'auto', paddingBottom: '10px' }}>
             {dailyData.map((d, i) => {
               const hInc = maxVal > 0 ? (d.inc / maxVal) * 100 : 0;
               const hExp = maxVal > 0 ? (d.exp / maxVal) * 100 : 0;
               return (
-                <div key={i} className="bar-group" style={{ minWidth: '40px' }}>
+                <div key={i} className="bar-group" style={{ minWidth: '42px' }}>
                   <div className="bars">
                     <div className="bar income-bar" style={{ height: `${hInc}%` }}></div>
                     <div className="bar expense-bar" style={{ height: `${hExp}%` }}></div>
@@ -207,11 +209,14 @@ const Report = () => {
         </div>
 
         {/* Income Donut */}
-        <div className="card" style={{ marginBottom: '22px' }}>
-          <div className="section-title" style={{ marginBottom: '20px' }}>{t('incomeProportion')}</div>
+        <div className="card" style={{ marginBottom: '24px' }}>
+          <div className="section-title" style={{ marginBottom: '20px' }}>
+            <PieChart size={24} strokeWidth={2.4} />
+            <span>{t('incomeProportion')}</span>
+          </div>
           <div className="donut-section">
             <div className="donut-chart" style={{ background: incDonut.conicGradient }}>
-              <div className="donut-center" style={{ width: '100px', height: '100px', background: 'var(--bg-card)', borderRadius: '50%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="donut-center" style={{ width: '108px', height: '108px', background: 'var(--bg-card)', borderRadius: '50%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div className="donut-center-value">฿{formatCurrency(income)}</div>
                 <div className="donut-center-label">{t('totalIncomeAll')}</div>
               </div>
@@ -224,10 +229,13 @@ const Report = () => {
 
         {/* Expense Donut */}
         <div className="card">
-          <div className="section-title" style={{ marginBottom: '20px' }}>{t('expenseProportion')}</div>
+          <div className="section-title" style={{ marginBottom: '20px' }}>
+            <PieChart size={24} strokeWidth={2.4} />
+            <span>{t('expenseProportion')}</span>
+          </div>
           <div className="donut-section">
             <div className="donut-chart" style={{ background: expDonut.conicGradient }}>
-              <div className="donut-center" style={{ width: '100px', height: '100px', background: 'var(--bg-card)', borderRadius: '50%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="donut-center" style={{ width: '108px', height: '108px', background: 'var(--bg-card)', borderRadius: '50%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div className="donut-center-value">฿{formatCurrency(expense)}</div>
                 <div className="donut-center-label">{t('totalExpenseAll')}</div>
               </div>
@@ -238,7 +246,7 @@ const Report = () => {
           </div>
         </div>
 
-        <div className="transaction-list" style={{ marginTop: '22px' }}>
+        <div className="transaction-list" style={{ marginTop: '24px' }}>
           {txs.slice().reverse().map(tx => (
             <TransactionItem key={tx.id} tx={tx} onDeleteClick={handleDeleteClick} />
           ))}
@@ -267,9 +275,9 @@ const Report = () => {
     let maxVal = 0;
     monthlyData.forEach(d => { if (d.inc > maxVal) maxVal = d.inc; if (d.exp > maxVal) maxVal = d.exp; });
 
-    const monthLabels = t('dayNames') ? ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'] : [];
+    const monthLabelsTh = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
     const monthLabelsEn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const labels = t('navDashboard') === 'Dashboard' ? monthLabelsEn : monthLabels;
+    const labels = t('navDashboard') === 'Dashboard' ? monthLabelsEn : monthLabelsTh;
 
     return (
       <div>
@@ -279,7 +287,7 @@ const Report = () => {
             className="date-input" 
             value={yearlyYear} 
             onChange={e => setYearlyYear(e.target.value)} 
-            style={{ width: '120px', textAlign: 'center', background: 'white' }}
+            style={{ width: '140px', textAlign: 'center', background: 'white' }}
           >
             {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
@@ -303,13 +311,16 @@ const Report = () => {
 
         {/* Yearly Bar Chart */}
         <div className="card chart-container">
-          <div className="section-title" style={{ marginBottom: '16px' }}>{t('monthlyChart')}</div>
+          <div className="section-title" style={{ marginBottom: '16px' }}>
+            <BarChart3 size={24} strokeWidth={2.4} />
+            <span>{t('monthlyChart')}</span>
+          </div>
           <div className="bar-chart" style={{ overflowX: 'auto', paddingBottom: '10px' }}>
             {monthlyData.map((d, i) => {
               const hInc = maxVal > 0 ? (d.inc / maxVal) * 100 : 0;
               const hExp = maxVal > 0 ? (d.exp / maxVal) * 100 : 0;
               return (
-                <div key={i} className="bar-group" style={{ minWidth: '50px' }}>
+                <div key={i} className="bar-group" style={{ minWidth: '54px' }}>
                   <div className="bars">
                     <div className="bar income-bar" style={{ height: `${hInc}%` }}></div>
                     <div className="bar expense-bar" style={{ height: `${hExp}%` }}></div>
@@ -322,16 +333,19 @@ const Report = () => {
         </div>
 
         {/* Monthly Summary Table */}
-        <div className="card" style={{ marginTop: '22px' }}>
-          <div className="section-title" style={{ marginBottom: '16px' }}>{t('monthlySummary')}</div>
+        <div className="card" style={{ marginTop: '24px' }}>
+          <div className="section-title" style={{ marginBottom: '16px' }}>
+            <Calendar size={24} strokeWidth={2.4} />
+            <span>{t('monthlySummary')}</span>
+          </div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '1rem' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid var(--border)' }}>
-                  <th style={{ padding: '10px 8px', textAlign: 'left', color: 'var(--text-secondary)' }}>{t('selectMonth').replace(':','')}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', color: 'var(--success)' }}>{t('navIncome')}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', color: 'var(--danger)' }}>{t('navExpense')}</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'right', color: 'var(--primary)' }}>{t('netProfit')}</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'left', color: 'var(--text-secondary)' }}>{t('selectMonth').replace(':','')}</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'right', color: 'var(--jade)' }}>{t('navIncome')}</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'right', color: 'var(--crimson)' }}>{t('navExpense')}</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'right', color: 'var(--primary)' }}>{t('netProfit')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -339,10 +353,10 @@ const Report = () => {
                   if (d.inc === 0 && d.exp === 0) return null;
                   return (
                     <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
-                      <td style={{ padding: '10px 8px', fontWeight: 600 }}>{labels[i]}</td>
-                      <td style={{ padding: '10px 8px', textAlign: 'right', color: 'var(--success)', fontWeight: 600 }}>฿{formatCurrency(d.inc)}</td>
-                      <td style={{ padding: '10px 8px', textAlign: 'right', color: 'var(--danger)', fontWeight: 600 }}>฿{formatCurrency(d.exp)}</td>
-                      <td style={{ padding: '10px 8px', textAlign: 'right', color: d.inc - d.exp >= 0 ? 'var(--primary)' : 'var(--danger)', fontWeight: 700 }}>฿{formatCurrency(d.inc - d.exp)}</td>
+                      <td style={{ padding: '12px 10px', fontWeight: 700 }}>{labels[i]}</td>
+                      <td style={{ padding: '12px 10px', textAlign: 'right', color: 'var(--jade)', fontWeight: 700 }}>฿{formatCurrency(d.inc)}</td>
+                      <td style={{ padding: '12px 10px', textAlign: 'right', color: 'var(--crimson)', fontWeight: 700 }}>฿{formatCurrency(d.exp)}</td>
+                      <td style={{ padding: '12px 10px', textAlign: 'right', color: d.inc - d.exp >= 0 ? 'var(--primary)' : 'var(--crimson)', fontWeight: 800 }}>฿{formatCurrency(d.inc - d.exp)}</td>
                     </tr>
                   );
                 })}
@@ -351,8 +365,8 @@ const Report = () => {
           </div>
         </div>
 
-        <div className="transaction-list" style={{ marginTop: '22px' }}>
-          {txs.length === 0 && <div style={{textAlign: 'center', color: 'var(--text-muted)', padding: '24px'}}>{t('noDataInPeriod')}</div>}
+        <div className="transaction-list" style={{ marginTop: '24px' }}>
+          {txs.length === 0 && <div style={{textAlign: 'center', color: 'var(--text-muted)', padding: '28px'}}>{t('noDataInPeriod')}</div>}
           {txs.slice().reverse().map(tx => (
             <TransactionItem key={tx.id} tx={tx} onDeleteClick={handleDeleteClick} />
           ))}
@@ -374,19 +388,30 @@ const Report = () => {
       {tab === 'yearly' && renderYearly()}
 
       {/* Backup / Restore / Logout */}
-      <div className="export-section" style={{ marginTop: '28px' }}>
-        <button className="btn-export" onClick={handleExport}>{t('backupData')}</button>
+      <div className="export-section">
+        <button className="btn-export" onClick={handleExport}>
+          <Download size={22} strokeWidth={2.4} />
+          <span>{t('backupData')}</span>
+        </button>
         <button className="btn-export" onClick={() => {
           if (currentUser?.isGuest) {
-            alert("เฉพาะผู้ได้รับอนุญาติ");
+            alert(t('unauthorizedMsg') || 'เฉพาะผู้ได้รับอนุญาต');
             return;
           }
           importRef.current?.click();
-        }}>{t('restoreData')}</button>
+        }}>
+          <Upload size={22} strokeWidth={2.4} />
+          <span>{t('restoreData')}</span>
+        </button>
         <input type="file" ref={importRef} accept=".json" style={{ display: 'none' }} onChange={handleImport} />
       </div>
-      <button className="btn-export" onClick={handleLogout} style={{ width: '100%', marginTop: '14px', borderColor: 'var(--danger)', color: 'var(--danger)' }}>
-        {t('logoutBtn')}
+      <button
+        className="btn-export"
+        onClick={handleLogout}
+        style={{ width: '100%', marginTop: '16px', borderColor: 'var(--crimson)', color: 'var(--crimson)' }}
+      >
+        <LogOut size={22} strokeWidth={2.4} />
+        <span>{t('logoutBtn')}</span>
       </button>
 
       <Modal 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, UtensilsCrossed, ClipboardList } from 'lucide-react';
 import { useTransactions } from '../context/TransactionContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -36,7 +36,7 @@ const Dashboard = () => {
 
   const handleNavigate = (path) => {
     if (currentUser?.isGuest) {
-      alert("เฉพาะผู้ได้รับอนุญาติ");
+      alert(t('unauthorizedMsg') || 'เฉพาะผู้ได้รับอนุญาต');
       return;
     }
     navigate(path);
@@ -45,29 +45,34 @@ const Dashboard = () => {
   return (
     <div className="page active">
       <div className="summary-grid">
-        <SummaryCard type="income" title={t('todayIncome')} amount={totalIncome} emoji="💰" />
-        <SummaryCard type="expense" title={t('todayExpense')} amount={totalExpense} emoji="💸" />
-        <SummaryCard type="profit" title={t('todayProfit')} amount={profit} emoji="✨" />
+        <SummaryCard type="income" title={t('todayIncome')} amount={totalIncome} />
+        <SummaryCard type="expense" title={t('todayExpense')} amount={totalExpense} />
+        <SummaryCard type="profit" title={t('todayProfit')} amount={profit} />
       </div>
 
       <div className="quick-actions">
-        <button className="btn-quick income-btn ripple" onClick={() => handleNavigate('/income')}>
-          <ArrowDownCircle size={24} /> {t('addIncome')}
+        <button className="btn-quick income-btn" onClick={() => handleNavigate('/income')}>
+          <ArrowDownCircle size={28} strokeWidth={2.4} /> {t('addIncome')}
         </button>
-        <button className="btn-quick expense-btn ripple" onClick={() => handleNavigate('/expense')}>
-          <ArrowUpCircle size={24} /> {t('addExpense')}
+        <button className="btn-quick expense-btn" onClick={() => handleNavigate('/expense')}>
+          <ArrowUpCircle size={28} strokeWidth={2.4} /> {t('addExpense')}
         </button>
       </div>
 
       <div className="card">
         <div className="today-list-header">
-          <div className="section-title">{t('todayList')}</div>
-          <div className="today-total">{t('totalIncome').split(' ')[0]}: ฿{formatCurrency(totalIncome - totalExpense)}</div>
+          <div className="section-title">
+            <ClipboardList size={24} strokeWidth={2.4} />
+            <span>{t('todayList')}</span>
+          </div>
+          <div className="today-total">{t('netTotal')}: ฿{formatCurrency(totalIncome - totalExpense)}</div>
         </div>
         
         {todaysTxs.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">🍜</div>
+            <div className="empty-seal">
+              <UtensilsCrossed size={36} strokeWidth={2.2} />
+            </div>
             <div className="empty-text">{t('emptyToday')}<br/>{t('emptyTodaySub')}</div>
           </div>
         ) : (

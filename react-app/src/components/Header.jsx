@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, Globe } from 'lucide-react';
+import { LogOut, Globe, UtensilsCrossed } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { formatTime } from '../utils/helpers';
@@ -32,14 +32,23 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-left">
-        <img src="icons/logo.png" className="header-logo-img" alt="Logo" onError={(e) => e.target.src='https://placehold.co/45x45?text=Logo'} />
+        <div className="header-logo-seal">
+          <UtensilsCrossed size={28} />
+        </div>
         <div>
-          <div className="header-title">{t('shopName')} <span style={{ fontSize: '0.6em', color: 'var(--text-muted)', fontWeight: 'normal' }}>v23</span></div>
+          <div className="header-title">
+            <span>{t('shopName')}</span>
+            <span className="header-version-pill">v24</span>
+          </div>
           <div className="header-date">{timeStr}</div>
         </div>
       </div>
       <div className="header-actions">
-        <button className="btn-icon" onClick={toggleLang} title={lang === 'th' ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'} style={{ fontSize: '0.85rem', fontWeight: 700 }}>
+        <button
+          className="btn-icon"
+          onClick={toggleLang}
+          title={lang === 'th' ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'}
+        >
           {lang === 'th' ? 'EN' : 'TH'}
         </button>
         <button className="btn-icon" onClick={handleLogout} title={t('logout')}>

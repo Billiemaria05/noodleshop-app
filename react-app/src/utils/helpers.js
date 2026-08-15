@@ -17,6 +17,7 @@ export const generateId = () => {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 };
 
-export const DONUT_COLORS = ['#FF6B35', '#004E89', '#00C896'];
+export const DONUT_COLORS = ['#8B1E1E', '#C69234', '#1F4E79', '#B52828', '#A47522'];
+export const INCOME_DONUT_COLORS = ['#26734D', '#349162', '#C69234', '#1F4E79', '#DFAB43'];
 export const ADMIN_EMAIL = 'khemmarin2548@gmail.com';
 export const STORAGE_KEY = 'noodleShopData_v16';
